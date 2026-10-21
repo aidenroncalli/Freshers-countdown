@@ -1,0 +1,10 @@
+{
+  "description": "Engage attendees with a countdown website featuring dual timers for theme and event reveals, a registration form, and automatic team assignments.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
