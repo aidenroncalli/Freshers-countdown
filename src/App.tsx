@@ -172,7 +172,7 @@ export default function App() {
     setStatus("idle")
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const digits = form.phone.replace(/\D/g, "")
 
@@ -184,30 +184,32 @@ export default function App() {
 
     setStatus("sending")
     setErrorMessage("")
-    const team = assignTeam(form.name, form.phone)
     const response = {
       name: form.name.trim(),
       phone: form.phone.trim(),
       attending: form.attending,
-      team: `Team ${team}`,
       submittedAt: new Date().toISOString(),
     }
 
     try {
+      let team = ""
       if (SHEETS_ENDPOINT) {
-        await fetch(SHEETS_ENDPOINT, {
+        const res = await fetch(SHEETS_ENDPOINT, {
           method: "POST",
-          mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(response),
         })
+        const result = await res.json()
+        team = result.team
+        if (!team) throw new Error("No team returned")
       } else {
+        team = assignTeam(form.name, form.phone)
         const saved = JSON.parse(
           window.localStorage.getItem("freshers-registrations") || "[]",
         )
         window.localStorage.setItem(
           "freshers-registrations",
-          JSON.stringify([...saved, response]),
+          JSON.stringify([...saved, { ...response, team: `Team ${team}` }]),
         )
       }
 
@@ -218,7 +220,6 @@ export default function App() {
       setStatus("error")
     }
   }
-
   return (
     <main>
       <div className="noise" aria-hidden="true" />
